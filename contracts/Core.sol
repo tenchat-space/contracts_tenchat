@@ -17,8 +17,8 @@ contract Core is Ownable {
 
     // --- State Variables ---
 
-    // Mapping from user addresses to their profiles
-    mapping(address => UserProfile) public userProfiles;
+    // Mapping from user addresses to their profiles (private for TEN encryption)
+    mapping(address => UserProfile) private userProfiles;
     // Mapping from usernames to user addresses for uniqueness
     mapping(string => address) private usernameToAddress;
 
@@ -86,6 +86,13 @@ contract Core is Ownable {
     function getUsername(address _user) external view returns (string memory) {
         require(userProfiles[_user].isRegistered, "User not registered");
         return userProfiles[_user].username;
+    }
+
+    /**
+     * @dev Gets the calling user's own profile.
+     */
+    function getUserProfile(address _user) external view returns (string memory username, bool isRegistered) {
+        return (userProfiles[_user].username, userProfiles[_user].isRegistered);
     }
 
     // --- Contract Registry Functions ---

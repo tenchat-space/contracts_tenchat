@@ -26,11 +26,11 @@ contract Subscription {
         bool isActive;
     }
 
-    // Mapping from a tier ID to the subscription tier
-    mapping(uint256 => SubscriptionTier) public subscriptionTiers;
+    // Mapping from a tier ID to the subscription tier (private for TEN encryption)
+    mapping(uint256 => SubscriptionTier) private subscriptionTiers;
 
-    // Mapping from a user to their subscription details
-    mapping(address => UserSubscription) public userSubscriptions;
+    // Mapping from a user to their subscription details (private for TEN encryption)
+    mapping(address => UserSubscription) private userSubscriptions;
 
     struct UserSubscription {
         uint256 tier;
@@ -115,5 +115,13 @@ contract Subscription {
      */
     function getSubscriptionDetails(address _user) external view returns (uint256 tier, uint256 expiresAt) {
         return (userSubscriptions[_user].tier, userSubscriptions[_user].expiresAt);
+    }
+
+    /**
+     * @dev Get subscription tier details
+     */
+    function getSubscriptionTier(uint256 _tierId) external view returns (uint256 price, uint256 duration, bool isActive) {
+        SubscriptionTier storage tier = subscriptionTiers[_tierId];
+        return (tier.price, tier.duration, tier.isActive);
     }
 }

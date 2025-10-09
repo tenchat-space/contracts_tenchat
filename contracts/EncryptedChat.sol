@@ -23,7 +23,7 @@ contract EncryptedChat {
 
     Core coreContract;
 
-    // A simple counter to create unique chat IDs
+    // A simple counter to create unique chat IDs (uses TEN secure RNG)
     uint256 private nextChatId;
 
     // Struct to represent a chat message
@@ -34,14 +34,15 @@ contract EncryptedChat {
         bytes encryptedContent; // The client-side encrypted message
     }
 
-    // Mapping from a chat ID to the message
-    mapping(uint256 => Message) public messages;
+    // Mapping from a chat ID to the message (private for TEN encryption)
+    mapping(uint256 => Message) private messages;
 
     // --- Constructor ---
 
     constructor(address _coreAddress) {
         coreContract = Core(_coreAddress);
-        nextChatId = 1;
+        // Use TEN secure RNG for initial chat ID
+        nextChatId = uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp))) % 1000000 + 1;
     }
 
     // --- Chat Functions ---

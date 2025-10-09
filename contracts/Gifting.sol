@@ -22,6 +22,18 @@ contract Gifting {
 
     Core coreContract;
 
+    // Mapping from user addresses to their gift history (private for TEN encryption)
+    mapping(address => Gift[]) private userGiftsSent;
+    mapping(address => Gift[]) private userGiftsReceived;
+
+    struct Gift {
+        address from;
+        address to;
+        address token;
+        uint256 amount;
+        uint256 timestamp;
+    }
+
     // --- Constructor ---
 
     constructor(address _coreAddress) {
@@ -52,6 +64,34 @@ contract Gifting {
         bool success = token.transferFrom(msg.sender, _to, _amount);
         require(success, "Token transfer failed");
 
+        // Store gift history (private on TEN for privacy)
+        Gift memory newGift = Gift({
+            from: msg.sender,
+            to: _to,
+            token: _tokenAddress,
+            amount: _amount,
+            timestamp: block.timestamp
+        });
+        
+        userGiftsSent[msg.sender].push(newGift);
+        userGiftsReceived[_to].push(newGift);
+
         emit GiftSent(msg.sender, _to, _tokenAddress, _amount);
+    }
+
+    /**
+     * @dev Gets the gift history sent by a user.
+     */
+    function getGiftsSent(address _user) external view returns (Gift[] memory) {
+        require(msg.sender == _user, "Can only view your own gift history");
+        return userGiftsSent[_user];
+    }
+
+    /**
+     * @dev Gets the gift history received by a user.
+     */
+    function getGiftsReceived(address _user) external view returns (Gift[] memory) {
+        require(msg.sender == _user, "Can only view your own gift history");
+        return userGiftsReceived[_user];
     }
 }
