@@ -39,7 +39,7 @@ const config: HardhatUserConfig = {
     ten: {
       type: "http",
       url: "https://testnet.ten.xyz/v1/",
-      chainId: 443,
+      chainId: 8443,
       accounts: [configVariable("TEN_PRIVATE_KEY")],
     },
   },
